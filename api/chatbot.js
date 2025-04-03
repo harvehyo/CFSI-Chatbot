@@ -53,4 +53,20 @@ app.post("/api/chatbot", async (req, res) => {
   }
 });
 
+fetch("/api/chatbot", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ message: userMessage, userId })
+})
+  .then(response => response.json())
+  .then(data => {
+    addMessage('Fati', data.response);
+  })
+  .catch(error => {
+    console.error("Error:", error);
+  });
+
+
 module.exports = app; // Export the app for Vercel to handle
