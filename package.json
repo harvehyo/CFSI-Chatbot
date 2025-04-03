@@ -2,11 +2,11 @@
   "name": "chatbot",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vercel dev",
-    "build": "vercel build",
+    "dev": "echo 'Run \"vercel dev\" directly from the terminal.'",
+    "build": "echo 'Build step not needed for Vercel'",
     "start": "vercel start"
   },
   "dependencies": {
-    "express": "^4.17.1"  
+    "express": "^4.17.1"
   }
 }

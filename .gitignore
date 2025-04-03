@@ -21,3 +21,4 @@ Thumbs.db          # Windows
 # Package manager lock files (if you are not committing these, but usually you should)
 # package-lock.json
 # yarn.lock
+.vercel
