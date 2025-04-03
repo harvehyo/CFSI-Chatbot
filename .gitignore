@@ -1,0 +1,23 @@
+# Node.js
+node_modules/
+
+# Sensitive API Keys and Configuration
+API.env
+
+# OS generated files
+.DS_Store          # macOS
+Thumbs.db          # Windows
+
+# IDE/Editor files
+.vscode/           # Visual Studio Code
+.idea/             # JetBrains IDEs (like WebStorm)
+
+# Log files
+*.log
+
+# Environment variables (for local setup, keep this in .env)
+.env
+
+# Package manager lock files (if you are not committing these, but usually you should)
+# package-lock.json
+# yarn.lock

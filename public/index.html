@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CFSI Chatbot</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen m-0">
+
+  <div class="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl bg-white rounded-lg shadow-lg p-6">
+    <div class="text-center mb-4">
+      <h1 class="text-2xl font-semibold text-green-600">CFSI Virtual Assistant</h1>
+    </div>
+
+    <div id="chat-box" class="space-y-4 h-96 overflow-y-auto bg-gray-50 p-4 rounded-lg mb-4 max-h-[500px]"></div>
+
+    <div class="flex items-center">
+      <input type="text" id="user-input" placeholder="Type your message..." class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+      <button id="send-btn" class="ml-4 p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const userId = Math.random().toString(36).substring(7);
+    const chatBox = document.getElementById("chat-box");
+
+    function addMessage(sender, message) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('p-2', 'rounded-lg', 'max-w-xs');
+      if (sender === 'You') {
+        messageDiv.classList.add('bg-blue-100', 'self-end', 'ml-auto');
+        messageDiv.innerHTML = `<strong>You:</strong> ${message}`;
+      } else {
+        messageDiv.classList.add('bg-green-100', 'self-start');
+        messageDiv.innerHTML = `<strong>Fati:</strong> ${message}`;
+      }
+      chatBox.appendChild(messageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const userMessage = document.getElementById("user-input").value.trim();
+      if (!userMessage) return;
+
+      addMessage('You', userMessage);
+      document.getElementById("user-input").value = "";
+
+      try {
+        const response = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage, userId }),
+        });
+
+        const data = await response.json();
+        addMessage('Fati', data.response);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+
+    document.getElementById("send-btn").addEventListener("click", sendMessage);
+
+    document.getElementById("user-input").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    window.onload = () => {
+      addMessage('Fati', "Hello! I'm Fati, your CFSI virtual assistant. How can I assist you today?");
+    };
+  </script>
+
+</body>
+</html>
