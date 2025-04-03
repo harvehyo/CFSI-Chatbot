@@ -1,9 +1,7 @@
-require("dotenv").config({ path: "API.env" });
-const express = require("express");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+// api/index.js
 
-const app = express();
-const port = 3000;
+require("dotenv").config({ path: "API.env" });
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -20,45 +18,38 @@ const generationConfig = {
   responseMimeType: "text/plain",
 };
 
-app.use(express.static("public"));
-app.use(express.json());
-
 // Store chat history per user session
 let userSessions = {};
 
-app.post("/ask", async (req, res) => {
-  const userId = req.body.userId || "guest";
-  const userMessage = req.body.message.trim();
+module.exports = (req, res) => {
+  if (req.method === 'POST') {
+    const userId = req.body.userId || "guest";
+    const userMessage = req.body.message.trim();
 
-  if (!userSessions[userId]) {
-    userSessions[userId] = { chatHistory: [] };
-  }
+    if (!userSessions[userId]) {
+      userSessions[userId] = { chatHistory: [] };
+    }
 
-  let userSession = userSessions[userId];
+    let userSession = userSessions[userId];
 
-  try {
-    // Directly add user message to chat history (no name request logic)
+    // Handle message
     userSession.chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
 
-    const chatSession = model.startChat({
+    model.startChat({
       generationConfig,
       history: userSession.chatHistory,
-    });
-
-    const result = await chatSession.sendMessage(userMessage);
-    const responseText = result.response.text();
-
-    // Add model's response to chat history
-    userSession.chatHistory.push({ role: "model", parts: [{ text: responseText }] });
-
-    // Send back the response
-    res.json({ response: responseText });
-  } catch (error) {
-    console.error(error);
-    res.json({ response: "Sorry, I couldn't process your request. Please try again." });
+    }).sendMessage(userMessage)
+      .then(result => {
+        const responseText = result.response.text();
+        userSession.chatHistory.push({ role: "model", parts: [{ text: responseText }] });
+        res.json({ response: responseText });
+      })
+      .catch(error => {
+        console.error(error);
+        res.json({ response: "Sorry, I couldn't process your request. Please try again." });
+      });
+  } else {
+    // Handle GET request (optional, if needed)
+    res.status(200).json({ message: 'Chatbot API is running' });
   }
-});
-
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+};
